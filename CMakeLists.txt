@@ -13,6 +13,8 @@ add_executable(prompt_injection_tester
     src/models/TestRun.cpp
     src/llm/MockLLM.cpp
     src/tests/InstructionOverrideTest.cpp
+    src/analysis/ResponseAnalyzer.cpp
+    src/engine/TestRunner.cpp
 )
 
 target_include_directories(prompt_injection_tester PRIVATE include)

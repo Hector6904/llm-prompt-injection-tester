@@ -11,7 +11,9 @@ Current architecture:
 - `LLMInterface` defines the LLM communication contract.
 - `MockLLM` is a deterministic, local `LLMInterface` implementation.
 - `InstructionOverrideTest` is the first concrete injection test.
+- `TestRunner` executes one injection test and coordinates analysis.
+- `ResponseAnalyzer` deterministically classifies its response.
 
-Current stage: core data models plus a local mock LLM flow. Real LLM
-integration will be added later; no networking, API, database, test runner, or
-frontend functionality is implemented.
+Current stage: a local mock-LLM execution and analysis pipeline. Real LLM
+integration will be added later; no networking, API, database, multi-test
+runner, or frontend functionality is implemented.
