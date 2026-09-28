@@ -1,10 +1,22 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(llm_prompt_injection_tester LANGUAGES CXX)
+project(llm_prompt_injection_tester LANGUAGES C CXX)
 
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+add_library(data_structures
+    src/data_structures/Queue.c
+    src/data_structures/Search.c
+    src/data_structures/Sort.c
+    src/data_structures/Stack.c
+)
+
+target_include_directories(data_structures PUBLIC include)
 
 add_executable(prompt_injection_tester
     src/main.cpp
@@ -22,3 +34,57 @@ target_include_directories(prompt_injection_tester PRIVATE include)
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(prompt_injection_tester PRIVATE -Wall -Wextra -Wpedantic)
 endif()
+
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(data_structures PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+enable_testing()
+
+add_executable(queue_tests
+    tests/test_queue.c
+)
+
+target_link_libraries(queue_tests PRIVATE data_structures)
+
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(queue_tests PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+add_test(NAME queue_tests COMMAND queue_tests)
+
+add_executable(stack_tests
+    tests/test_stack.c
+)
+
+target_link_libraries(stack_tests PRIVATE data_structures)
+
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(stack_tests PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+add_test(NAME stack_tests COMMAND stack_tests)
+
+add_executable(search_tests
+    tests/test_search.c
+)
+
+target_link_libraries(search_tests PRIVATE data_structures)
+
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(search_tests PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+add_test(NAME search_tests COMMAND search_tests)
+
+add_executable(sort_tests
+    tests/test_sort.c
+)
+
+target_link_libraries(sort_tests PRIVATE data_structures)
+
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(sort_tests PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+add_test(NAME sort_tests COMMAND sort_tests)
