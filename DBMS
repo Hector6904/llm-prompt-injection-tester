@@ -1,1 +1,62 @@
+CREATE DATABASE llm_injection_tester;
+
+SHOW DATABASES;
+
+USE llm_injection_tester;
+
+CREATE TABLE LLM_MODELS (
+    model_id INT AUTO_INCREMENT PRIMARY KEY,
+    model_name VARCHAR(100) NOT NULL,
+    provider VARCHAR(50) NOT NULL,
+    endpoint VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE INJECTION_TESTS (
+    test_id INT AUTO_INCREMENT PRIMARY KEY,
+    test_name VARCHAR(100) NOT NULL,
+    category VARCHAR(50) NOT NULL,
+    prompt TEXT NOT NULL,
+    expected_behavior VARCHAR(255),
+    severity ENUM('LOW','MEDIUM','HIGH','CRITICAL')
+);
+
+CREATE TABLE TEST_RUNS (
+    run_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    model_id INT NOT NULL,
+
+    started_at DATETIME,
+    completed_at DATETIME,
+
+    total_tests INT DEFAULT 0,
+
+    FOREIGN KEY (model_id)
+    REFERENCES LLM_MODELS(model_id)
+);
+
+CREATE TABLE TEST_RESULTS (
+    result_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    run_id INT NOT NULL,
+    test_id INT NOT NULL,
+
+    response TEXT,
+
+    status ENUM('PASS','FAIL','PARTIAL'),
+
+    severity ENUM('LOW','MEDIUM','HIGH','CRITICAL'),
+
+    analysis TEXT,
+
+    execution_time DECIMAL(6,2),
+
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (run_id)
+        REFERENCES TEST_RUNS(run_id),
+
+    FOREIGN KEY (test_id)
+        REFERENCES INJECTION_TESTS(test_id)
+);
 
