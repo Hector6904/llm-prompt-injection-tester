@@ -4,6 +4,10 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* The queue holds pending InjectionTest identifiers until C/C++ integration. */
 #define INJECTION_TEST_QUEUE_CAPACITY 10U
 
@@ -28,5 +32,9 @@ bool queue_is_empty(const TestQueue *queue);
 
 /* A NULL queue is never considered full; mutation operations still reject it. */
 bool queue_is_full(const TestQueue *queue);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  /* DATA_STRUCTURES_QUEUE_H */

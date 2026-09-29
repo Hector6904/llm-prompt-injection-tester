@@ -27,9 +27,11 @@ add_executable(prompt_injection_tester
     src/tests/InstructionOverrideTest.cpp
     src/analysis/ResponseAnalyzer.cpp
     src/engine/TestRunner.cpp
+    src/engine/TestExecutionCoordinator.cpp
 )
 
 target_include_directories(prompt_injection_tester PRIVATE include)
+target_link_libraries(prompt_injection_tester PRIVATE data_structures)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(prompt_injection_tester PRIVATE -Wall -Wextra -Wpedantic)
@@ -88,3 +90,21 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
 endif()
 
 add_test(NAME sort_tests COMMAND sort_tests)
+
+add_executable(engine_integration_tests
+    tests/test_engine_integration.cpp
+    src/models/InjectionTest.cpp
+    src/models/TestResult.cpp
+    src/analysis/ResponseAnalyzer.cpp
+    src/engine/TestRunner.cpp
+    src/engine/TestExecutionCoordinator.cpp
+)
+
+target_include_directories(engine_integration_tests PRIVATE include)
+target_link_libraries(engine_integration_tests PRIVATE data_structures)
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(engine_integration_tests PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+add_test(NAME engine_integration_tests COMMAND engine_integration_tests)

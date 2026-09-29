@@ -4,6 +4,10 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* The stack holds TestResult identifiers until C/C++ integration. */
 #define TEST_RESULT_STACK_CAPACITY 10U
 
@@ -29,5 +33,9 @@ bool stack_is_empty(const TestResultStack *stack);
 
 /* A NULL stack is never considered full; mutation operations still reject it. */
 bool stack_is_full(const TestResultStack *stack);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  /* DATA_STRUCTURES_STACK_H */

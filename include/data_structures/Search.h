@@ -3,6 +3,10 @@
 
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * Returns the first matching index, or -1 when the target is absent or array is
  * NULL. The array size must permit every valid index to be represented as int.
@@ -15,5 +19,9 @@ int linear_search(const int array[], size_t size, int target);
  * may be returned. The array size must permit every valid index as an int.
  */
 int binary_search(const int array[], size_t size, int target);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  /* DATA_STRUCTURES_SEARCH_H */

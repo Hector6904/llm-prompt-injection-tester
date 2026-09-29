@@ -6,7 +6,7 @@ class LLMInterface;
 
 class InstructionOverrideTest : public InjectionTest {
 public:
-    explicit InstructionOverrideTest(LLMInterface& llm);
+    explicit InstructionOverrideTest(LLMInterface& llm, int testId = 1);
 
     std::string execute() override;
 
