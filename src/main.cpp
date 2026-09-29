@@ -7,7 +7,10 @@
 #include "engine/TestRunner.h"
 #include "llm/LLMInterface.h"
 #include "llm/MockLLM.h"
+#include "tests/ContextManipulationTest.h"
 #include "tests/InstructionOverrideTest.h"
+#include "tests/PromptExtractionTest.h"
+#include "tests/RoleManipulationTest.h"
 
 namespace {
 
@@ -34,22 +37,24 @@ int main() {
     LLMInterface& llm = mockLlm;
     ResponseAnalyzer analyzer;
     TestRunner runner(analyzer);
-    InstructionOverrideTest firstTest(llm, 30);
-    InstructionOverrideTest secondTest(llm, 10);
-    InstructionOverrideTest thirdTest(llm, 20);
+    InstructionOverrideTest instructionOverrideTest(llm, 10);
+    PromptExtractionTest promptExtractionTest(llm, 20);
+    RoleManipulationTest roleManipulationTest(llm, 30);
+    ContextManipulationTest contextManipulationTest(llm, 40);
 
     TestExecutionCoordinator coordinator(runner);
     const TestExecutionCoordinator::TestRegistry tests = {
-        {firstTest.getTestId(), &firstTest},
-        {secondTest.getTestId(), &secondTest},
-        {thirdTest.getTestId(), &thirdTest},
+        {instructionOverrideTest.getTestId(), &instructionOverrideTest},
+        {promptExtractionTest.getTestId(), &promptExtractionTest},
+        {roleManipulationTest.getTestId(), &roleManipulationTest},
+        {contextManipulationTest.getTestId(), &contextManipulationTest},
     };
 
     std::cout << "LLM Prompt Injection Vulnerability Tester\n";
     std::cout << "Flow: C queue -> TestRunner -> MockLLM -> ResponseAnalyzer -> "
                  "C stack/search/sort\n";
 
-    for (const int testId : {30, 10, 20, 999}) {
+    for (const int testId : {30, 10, 40, 20, 999}) {
         if (!coordinator.enqueueTestId(testId)) {
             std::cerr << "Could not enqueue test ID " << testId << ".\n";
         }

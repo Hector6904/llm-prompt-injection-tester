@@ -4,9 +4,9 @@
 
 class LLMInterface;
 
-class InstructionOverrideTest : public InjectionTest {
+class PromptExtractionTest : public InjectionTest {
 public:
-    explicit InstructionOverrideTest(LLMInterface& llm, int testId = 1);
+    explicit PromptExtractionTest(LLMInterface& llm, int testId = 2);
 
     std::string execute() override;
     ResponseAssessment assessResponse(const std::string& response) const override;

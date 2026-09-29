@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "models/ResponseAssessment.h"
+
 class InjectionTest {
 public:
     InjectionTest(int testId, const std::string& testName, const std::string& category,
@@ -25,6 +27,12 @@ public:
 
     // Concrete test types will provide their own execution behavior.
     virtual std::string execute() = 0;
+
+    /*
+     * The default is deliberately inconclusive. Concrete tests override this
+     * with narrowly scoped criteria for their own injection technique.
+     */
+    virtual ResponseAssessment assessResponse(const std::string& response) const;
 
 private:
     int testId_;

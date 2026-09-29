@@ -25,6 +25,9 @@ add_executable(prompt_injection_tester
     src/models/TestRun.cpp
     src/llm/MockLLM.cpp
     src/tests/InstructionOverrideTest.cpp
+    src/tests/PromptExtractionTest.cpp
+    src/tests/RoleManipulationTest.cpp
+    src/tests/ContextManipulationTest.cpp
     src/analysis/ResponseAnalyzer.cpp
     src/engine/TestRunner.cpp
     src/engine/TestExecutionCoordinator.cpp
@@ -98,6 +101,11 @@ add_executable(engine_integration_tests
     src/analysis/ResponseAnalyzer.cpp
     src/engine/TestRunner.cpp
     src/engine/TestExecutionCoordinator.cpp
+    src/llm/MockLLM.cpp
+    src/tests/InstructionOverrideTest.cpp
+    src/tests/PromptExtractionTest.cpp
+    src/tests/RoleManipulationTest.cpp
+    src/tests/ContextManipulationTest.cpp
 )
 
 target_include_directories(engine_integration_tests PRIVATE include)
@@ -108,3 +116,23 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 endif()
 
 add_test(NAME engine_integration_tests COMMAND engine_integration_tests)
+
+add_executable(response_assessment_tests
+    tests/test_response_assessment.cpp
+    src/models/InjectionTest.cpp
+    src/models/TestResult.cpp
+    src/analysis/ResponseAnalyzer.cpp
+    src/engine/TestRunner.cpp
+    src/tests/InstructionOverrideTest.cpp
+    src/tests/PromptExtractionTest.cpp
+    src/tests/RoleManipulationTest.cpp
+    src/tests/ContextManipulationTest.cpp
+)
+
+target_include_directories(response_assessment_tests PRIVATE include)
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(response_assessment_tests PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+add_test(NAME response_assessment_tests COMMAND response_assessment_tests)

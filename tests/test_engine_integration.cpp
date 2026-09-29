@@ -9,7 +9,12 @@
 #include "data_structures/Stack.h"
 #include "engine/TestExecutionCoordinator.h"
 #include "engine/TestRunner.h"
+#include "llm/MockLLM.h"
 #include "models/InjectionTest.h"
+#include "tests/ContextManipulationTest.h"
+#include "tests/InstructionOverrideTest.h"
+#include "tests/PromptExtractionTest.h"
+#include "tests/RoleManipulationTest.h"
 
 #define CHECK(condition)                                                        \
     do {                                                                        \
@@ -138,12 +143,47 @@ bool test_stack_overflow_is_recorded_without_losing_results() {
     return true;
 }
 
+bool test_all_concrete_test_types_execute_through_coordinator() {
+    MockLLM mockLlm;
+    ResponseAnalyzer analyzer;
+    TestRunner runner(analyzer);
+    TestExecutionCoordinator coordinator(runner);
+    InstructionOverrideTest instructionTest(mockLlm, 10);
+    PromptExtractionTest promptTest(mockLlm, 20);
+    RoleManipulationTest roleTest(mockLlm, 30);
+    ContextManipulationTest contextTest(mockLlm, 40);
+    const TestExecutionCoordinator::TestRegistry tests = {
+        {10, &instructionTest}, {20, &promptTest}, {30, &roleTest}, {40, &contextTest},
+    };
+
+    for (const int testId : {30, 10, 40, 20}) {
+        CHECK(coordinator.enqueueTestId(testId));
+    }
+    coordinator.executePendingTests(tests, 9);
+
+    const std::vector<int> expectedExecution = {30, 10, 40, 20};
+    const std::vector<int> expectedResultIds = {1000, 990, 980, 970};
+    CHECK(coordinator.getExecutedTestIds() == expectedExecution);
+    CHECK(coordinator.getCreatedResultIds() == expectedResultIds);
+    CHECK(coordinator.getInvalidTestIds().empty());
+
+    for (std::size_t index = 0U; index < expectedExecution.size(); ++index) {
+        const TestResult* result = coordinator.findResult(expectedResultIds[index]);
+        CHECK(result != nullptr);
+        CHECK(result->getTestId() == expectedExecution[index]);
+        CHECK(result->getStatus() == "PASS");
+        CHECK(result->getSeverity() == "LOW");
+    }
+    return true;
+}
+
 }  // namespace
 
 int main() {
     if (!test_queue_execution_result_association_and_searching() ||
         !test_empty_collections_and_queue_overflow() ||
-        !test_stack_overflow_is_recorded_without_losing_results()) {
+        !test_stack_overflow_is_recorded_without_losing_results() ||
+        !test_all_concrete_test_types_execute_through_coordinator()) {
         return 1;
     }
 

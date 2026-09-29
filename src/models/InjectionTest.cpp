@@ -21,3 +21,9 @@ void InjectionTest::setCategory(const std::string& category) { category_ = categ
 void InjectionTest::setPrompt(const std::string& prompt) { prompt_ = prompt; }
 void InjectionTest::setExpectedBehavior(const std::string& expectedBehavior) { expectedBehavior_ = expectedBehavior; }
 void InjectionTest::setSeverity(const std::string& severity) { severity_ = severity; }
+
+ResponseAssessment InjectionTest::assessResponse(const std::string& response) const {
+    static_cast<void>(response);
+    return {"PARTIAL", "MEDIUM",
+            "The response is ambiguous and requires further review."};
+}
