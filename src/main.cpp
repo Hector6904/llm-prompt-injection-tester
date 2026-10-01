@@ -7,6 +7,7 @@
 #include "engine/TestRunner.h"
 #include "llm/LLMInterface.h"
 #include "llm/MockLLM.h"
+#include "models/TestRun.h"
 #include "tests/ContextManipulationTest.h"
 #include "tests/InstructionOverrideTest.h"
 #include "tests/PromptExtractionTest.h"
@@ -43,6 +44,7 @@ int main() {
     ContextManipulationTest contextManipulationTest(llm, 40);
 
     TestExecutionCoordinator coordinator(runner);
+    TestRun testRun(1, 1);
     const TestExecutionCoordinator::TestRegistry tests = {
         {instructionOverrideTest.getTestId(), &instructionOverrideTest},
         {promptExtractionTest.getTestId(), &promptExtractionTest},
@@ -59,7 +61,13 @@ int main() {
             std::cerr << "Could not enqueue test ID " << testId << ".\n";
         }
     }
-    coordinator.executePendingTests(tests, 1);
+    coordinator.executePendingTests(tests, testRun);
+
+    std::cout << "Run ID: " << testRun.getRunId() << '\n';
+    std::cout << "Model ID: " << testRun.getModelId() << '\n';
+    std::cout << "Started at: " << testRun.getStartedAt() << '\n';
+    std::cout << "Completed at: " << testRun.getCompletedAt() << '\n';
+    std::cout << "Executed tests in run: " << testRun.getTotalTests() << '\n';
 
     std::cout << "FIFO executed test IDs:";
     displayIds(coordinator.getExecutedTestIds());

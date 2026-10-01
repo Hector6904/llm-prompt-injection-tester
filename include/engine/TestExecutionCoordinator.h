@@ -10,6 +10,7 @@
 
 class InjectionTest;
 class TestRunner;
+class TestRun;
 
 enum class ResultIdSortAlgorithm {
     Bubble,
@@ -31,6 +32,7 @@ public:
 
     bool enqueueTestId(int testId);
     void executePendingTests(const TestRegistry& tests, int runId);
+    void executePendingTests(const TestRegistry& tests, TestRun& run);
 
     const std::vector<int>& getExecutedTestIds() const;
     const std::vector<int>& getInvalidTestIds() const;

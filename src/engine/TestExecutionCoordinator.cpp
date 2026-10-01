@@ -7,6 +7,7 @@
 #include "data_structures/Sort.h"
 #include "engine/TestRunner.h"
 #include "models/InjectionTest.h"
+#include "models/TestRun.h"
 
 TestExecutionCoordinator::TestExecutionCoordinator(TestRunner& runner)
     : runner_(runner), pendingTests_{}, resultStack_{}, nextResultId_(1000),
@@ -41,6 +42,17 @@ void TestExecutionCoordinator::executePendingTests(const TestRegistry& tests, in
             ++stackOverflowCount_;
         }
     }
+}
+
+void TestExecutionCoordinator::executePendingTests(const TestRegistry& tests, TestRun& run) {
+    if (run.isCompleted()) {
+        return;
+    }
+
+    const std::size_t executedBefore = executedTestIds_.size();
+    executePendingTests(tests, run.getRunId());
+    const std::size_t executedThisBatch = executedTestIds_.size() - executedBefore;
+    run.complete(static_cast<int>(executedThisBatch));
 }
 
 const std::vector<int>& TestExecutionCoordinator::getExecutedTestIds() const {

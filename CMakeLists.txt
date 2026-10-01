@@ -98,6 +98,7 @@ add_executable(engine_integration_tests
     tests/test_engine_integration.cpp
     src/models/InjectionTest.cpp
     src/models/TestResult.cpp
+    src/models/TestRun.cpp
     src/analysis/ResponseAnalyzer.cpp
     src/engine/TestRunner.cpp
     src/engine/TestExecutionCoordinator.cpp

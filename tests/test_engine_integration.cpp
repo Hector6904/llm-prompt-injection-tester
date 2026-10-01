@@ -11,6 +11,7 @@
 #include "engine/TestRunner.h"
 #include "llm/MockLLM.h"
 #include "models/InjectionTest.h"
+#include "models/TestRun.h"
 #include "tests/ContextManipulationTest.h"
 #include "tests/InstructionOverrideTest.h"
 #include "tests/PromptExtractionTest.h"
@@ -72,6 +73,8 @@ bool test_queue_execution_result_association_and_searching() {
     CHECK(secondResult != nullptr);
     CHECK(firstResult->getTestId() == 20);
     CHECK(secondResult->getTestId() == 30);
+    CHECK(firstResult->getRunId() == 7);
+    CHECK(secondResult->getRunId() == 7);
     CHECK(coordinator.findResult(999) == nullptr);
 
     CHECK(coordinator.findResultIdLinear(1000) == 0);
@@ -171,9 +174,97 @@ bool test_all_concrete_test_types_execute_through_coordinator() {
         const TestResult* result = coordinator.findResult(expectedResultIds[index]);
         CHECK(result != nullptr);
         CHECK(result->getTestId() == expectedExecution[index]);
+        CHECK(result->getRunId() == 9);
         CHECK(result->getStatus() == "PASS");
         CHECK(result->getSeverity() == "LOW");
     }
+    return true;
+}
+
+bool test_run_initialization_and_completion_protection() {
+    TestRun run(71, 3);
+    CHECK(run.getRunId() == 71);
+    CHECK(run.getModelId() == 3);
+    CHECK(!run.getStartedAt().empty());
+    CHECK(run.getCompletedAt().empty());
+    CHECK(run.getTotalTests() == 0);
+    CHECK(!run.isCompleted());
+
+    CHECK(run.complete(2));
+    const std::string completedAt = run.getCompletedAt();
+    CHECK(!completedAt.empty());
+    CHECK(run.getTotalTests() == 2);
+    CHECK(run.isCompleted());
+    CHECK(!run.complete(9));
+    CHECK(run.getCompletedAt() == completedAt);
+    CHECK(run.getTotalTests() == 2);
+    return true;
+}
+
+bool test_run_lifecycle_counts_only_valid_execution() {
+    ResponseAnalyzer analyzer;
+    TestRunner runner(analyzer);
+    TestExecutionCoordinator coordinator(runner);
+    std::vector<int> executionLog;
+    RecordingTest testTwenty(20, executionLog);
+    RecordingTest testThirty(30, executionLog);
+    const TestExecutionCoordinator::TestRegistry tests = {
+        {20, &testTwenty}, {30, &testThirty},
+    };
+    TestRun run(72, 1);
+
+    CHECK(coordinator.enqueueTestId(30));
+    CHECK(coordinator.enqueueTestId(999));
+    CHECK(coordinator.enqueueTestId(20));
+    coordinator.executePendingTests(tests, run);
+
+    const std::vector<int> expectedExecution = {30, 20};
+    CHECK(executionLog == expectedExecution);
+    CHECK(coordinator.getExecutedTestIds() == expectedExecution);
+    CHECK(coordinator.getInvalidTestIds() == std::vector<int>({999}));
+    CHECK(run.isCompleted());
+    CHECK(!run.getCompletedAt().empty());
+    CHECK(run.getTotalTests() == 2);
+
+    for (const int resultId : coordinator.getCreatedResultIds()) {
+        const TestResult* result = coordinator.findResult(resultId);
+        CHECK(result != nullptr);
+        CHECK(result->getRunId() == run.getRunId());
+    }
+
+    std::vector<int> sortedResultIds;
+    CHECK(coordinator.sortResultIds(ResultIdSortAlgorithm::Quick, &sortedResultIds));
+    CHECK(coordinator.findResultIdBinary(sortedResultIds, 990) == 0);
+
+    int resultId = 0;
+    CHECK(coordinator.popLatestResultId(&resultId));
+    CHECK(resultId == 990);
+    CHECK(coordinator.popLatestResultId(&resultId));
+    CHECK(resultId == 1000);
+    return true;
+}
+
+bool test_empty_and_completed_runs_do_not_execute_tests() {
+    ResponseAnalyzer analyzer;
+    TestRunner runner(analyzer);
+    TestExecutionCoordinator coordinator(runner);
+    TestExecutionCoordinator::TestRegistry tests;
+    TestRun emptyRun(73, 1);
+
+    coordinator.executePendingTests(tests, emptyRun);
+    CHECK(emptyRun.isCompleted());
+    CHECK(!emptyRun.getCompletedAt().empty());
+    CHECK(emptyRun.getTotalTests() == 0);
+    CHECK(coordinator.getCreatedResultIds().empty());
+
+    std::vector<int> executionLog;
+    RecordingTest testTen(10, executionLog);
+    tests.emplace(10, &testTen);
+    CHECK(coordinator.enqueueTestId(10));
+    coordinator.executePendingTests(tests, emptyRun);
+    CHECK(executionLog.empty());
+    CHECK(emptyRun.getTotalTests() == 0);
+    CHECK(coordinator.getCreatedResultIds().empty());
     return true;
 }
 
@@ -183,7 +274,10 @@ int main() {
     if (!test_queue_execution_result_association_and_searching() ||
         !test_empty_collections_and_queue_overflow() ||
         !test_stack_overflow_is_recorded_without_losing_results() ||
-        !test_all_concrete_test_types_execute_through_coordinator()) {
+        !test_all_concrete_test_types_execute_through_coordinator() ||
+        !test_run_initialization_and_completion_protection() ||
+        !test_run_lifecycle_counts_only_valid_execution() ||
+        !test_empty_and_completed_runs_do_not_execute_tests()) {
         return 1;
     }
 
