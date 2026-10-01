@@ -8,15 +8,11 @@
 extern "C" {
 #endif
 
-/* Each function sorts array in ascending order and returns false when array is NULL. */
 bool bubble_sort(int array[], size_t size);
 bool selection_sort(int array[], size_t size);
 bool insertion_sort(int array[], size_t size);
 
-/*
- * Merge sort returns false when array is NULL or temporary-buffer allocation fails.
- * On allocation failure, the array is left unchanged.
- */
+
 bool merge_sort(int array[], size_t size);
 
 bool quick_sort(int array[], size_t size);
