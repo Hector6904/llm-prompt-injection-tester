@@ -137,3 +137,24 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 endif()
 
 add_test(NAME response_assessment_tests COMMAND response_assessment_tests)
+
+find_package(Threads REQUIRED)
+add_executable(tester_web
+    web/server.cpp
+    web/engine_bridge.cpp
+    src/models/InjectionTest.cpp
+    src/models/TestResult.cpp
+    src/models/TestRun.cpp
+    src/llm/MockLLM.cpp
+    src/tests/InstructionOverrideTest.cpp
+    src/tests/PromptExtractionTest.cpp
+    src/tests/RoleManipulationTest.cpp
+    src/tests/ContextManipulationTest.cpp
+    src/analysis/ResponseAnalyzer.cpp
+    src/engine/TestRunner.cpp
+    src/engine/TestExecutionCoordinator.cpp
+)
+target_include_directories(tester_web PRIVATE include)
+target_link_libraries(tester_web PRIVATE data_structures Threads::Threads)
+add_custom_command(TARGET tester_web POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/web $<TARGET_FILE_DIR:tester_web>/web)
