@@ -5,6 +5,7 @@ COPY CMakeLists.txt ./
 COPY include ./include
 COPY src ./src
 COPY web ./web
+COPY tests ./tests
 RUN cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --target tester_web -j2
 
 FROM ubuntu:24.04
