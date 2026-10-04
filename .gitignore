@@ -2,23 +2,4 @@ build/
 
 /build-sanitize/
 
-# Visual Studio
-.vs/
-*.user
-*.suo
-*.VC.db
-*.VC.opendb
 
-# Build outputs
-out/
-x64/
-Debug/
-Release/
-
-# CMake
-CMakeFiles/
-CMakeCache.txt
-cmake_install.cmake
-
-.vs/
-CMakeSettings.json
