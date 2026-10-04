@@ -2,6 +2,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "database/DatabaseManager.h"
+
 #include "analysis/ResponseAnalyzer.h"
 #include "engine/TestExecutionCoordinator.h"
 #include "engine/TestRunner.h"
@@ -34,6 +36,15 @@ void displayIds(const std::vector<int>& ids) {
 }  // namespace
 
 int main() {
+
+    DatabaseManager database;
+
+    if (!database.connect()) {
+        std::cerr << "Could not connect to database.\n";
+        return 1;
+    }
+
+    database.createTestRun(1);
     MockLLM mockLlm;
     LLMInterface& llm = mockLlm;
     ResponseAnalyzer analyzer;
@@ -50,6 +61,7 @@ int main() {
         {promptExtractionTest.getTestId(), &promptExtractionTest},
         {roleManipulationTest.getTestId(), &roleManipulationTest},
         {contextManipulationTest.getTestId(), &contextManipulationTest},
+
     };
 
     std::cout << "LLM Prompt Injection Vulnerability Tester\n";

@@ -20,6 +20,7 @@ target_include_directories(data_structures PUBLIC include)
 
 add_executable(prompt_injection_tester
     src/main.cpp
+    src/database/DatabaseManager.cpp
     src/models/InjectionTest.cpp
     src/models/TestResult.cpp
     src/models/TestRun.cpp
@@ -158,3 +159,18 @@ target_include_directories(tester_web PRIVATE include)
 target_link_libraries(tester_web PRIVATE data_structures Threads::Threads)
 add_custom_command(TARGET tester_web POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/web $<TARGET_FILE_DIR:tester_web>/web)
+
+
+
+# MySQL Connector/C++
+target_include_directories(prompt_injection_tester PRIVATE
+    D:/mysql-connector-c++-26.7.0-winx64/include/jdbc
+)
+
+target_link_directories(prompt_injection_tester PRIVATE
+    D:/mysql-connector-c++-26.7.0-winx64/lib64/vs14
+)
+
+target_link_libraries(prompt_injection_tester PRIVATE
+    mysqlcppconn
+)

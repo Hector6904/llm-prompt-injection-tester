@@ -2,4 +2,27 @@ build/
 
 /build-sanitize/
 
+<<<<<<< HEAD
 
+=======
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.VC.db
+*.VC.opendb
+
+# Build outputs
+out/
+x64/
+Debug/
+Release/
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+
+.vs/
+CMakeSettings.json
+>>>>>>> a4d1257 (Add MySQL database integration)
