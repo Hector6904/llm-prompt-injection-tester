@@ -10,7 +10,7 @@
 DatabaseManager::DatabaseManager()
     : host_("localhost"),
     username_("root"),
-    password_("Ira@sql"),
+    password_(""),
     database_("llm_injection_tester") {
 }
 
