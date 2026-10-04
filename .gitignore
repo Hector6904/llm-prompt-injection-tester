@@ -19,3 +19,6 @@ Release/
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
+
+.vs/
+CMakeSettings.json
