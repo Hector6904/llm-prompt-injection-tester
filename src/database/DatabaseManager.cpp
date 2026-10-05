@@ -10,7 +10,7 @@
 DatabaseManager::DatabaseManager()
     : host_("localhost"),
     username_("root"),
-    password_(""),
+    password_("Ira@sql"),
     database_("llm_injection_tester") {
 }
 
@@ -72,6 +72,46 @@ bool DatabaseManager::createTestRun(int modelId) {
     }
     catch (const sql::SQLException& error) {
         std::cerr << "Failed to insert test run.\n";
+        std::cerr << error.what() << '\n';
+
+        return false;
+    }
+}
+
+bool DatabaseManager::createTestResult(
+    int runId,
+    int testId,
+    const std::string& response,
+    const std::string& status,
+    const std::string& severity,
+    const std::string& analysis,
+    double executionTime) {
+
+    try {
+        std::unique_ptr<sql::PreparedStatement> statement(
+            connection_->prepareStatement(
+                "INSERT INTO TEST_RESULTS "
+                "(run_id, test_id, response, status, severity, analysis, execution_time) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?)"
+            )
+        );
+
+        statement->setInt(1, runId);
+        statement->setInt(2, testId);
+        statement->setString(3, response);
+        statement->setString(4, status);
+        statement->setString(5, severity);
+        statement->setString(6, analysis);
+        statement->setDouble(7, executionTime);
+
+        statement->execute();
+
+        std::cout << "Test result inserted into database.\n";
+
+        return true;
+    }
+    catch (const sql::SQLException& error) {
+        std::cerr << "Failed to insert test result.\n";
         std::cerr << error.what() << '\n';
 
         return false;

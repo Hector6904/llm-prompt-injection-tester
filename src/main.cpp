@@ -102,16 +102,27 @@ int main() {
         return 1;
     }
 
-    std::cout << "Quick-sorted result IDs:";
-    displayIds(sortedResultIds);
-    std::cout << "Binary search for result ID " << resultIdToFind << ": index "
-              << coordinator.findResultIdBinary(sortedResultIds, resultIdToFind) << '\n';
-
     std::cout << "Results retrieved through their sorted IDs:\n";
     for (const int resultId : sortedResultIds) {
         const TestResult* result = coordinator.findResult(resultId);
+
         if (result != nullptr) {
             displayResult(*result);
+
+            std::cout << "Saving result:"
+                << " runId=" << result->getRunId()
+                << " testId=" << result->getTestId()
+                << '\n';
+
+            database.createTestResult(
+                result->getRunId(),
+                result->getTestId(),
+                result->getResponse(),
+                result->getStatus(),
+                result->getSeverity(),
+                result->getAnalysis(),
+                result->getExecutionTime()
+            );
         }
     }
 
